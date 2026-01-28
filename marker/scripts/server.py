@@ -1,3 +1,19 @@
+"""
+FastAPI сервер для веб-интеграции Marker.
+
+Веб-сервер на основе FastAPI, предоставляющий REST API для конвертации
+документов через HTTP запросы. Поддерживает загрузку файлов, обработку
+документов и возврат результатов в различных форматах.
+
+Функции:
+- Конвертация документов через HTTP API
+- Загрузка и обработка файлов
+- Документация API через Swagger/OpenAPI
+- Асинхронная обработка запросов
+
+Автор: Marker Team
+"""
+
 import traceback
 
 import click
@@ -19,28 +35,46 @@ from marker.converters.pdf import PdfConverter
 from marker.models import create_model_dict
 from marker.settings import settings
 
+# Глобальные данные приложения (модели и другая информация)
 app_data = {}
 
-
+# Директория для временного хранения загруженных файлов
 UPLOAD_DIRECTORY = "./uploads"
 os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """
+    Управление жизненным циклом FastAPI приложения.
+    
+    Инициализирует модели при запуске и очищает ресурсы при завершении.
+    
+    Args:
+        app (FastAPI): Экземпляр FastAPI приложения
+    """
+    # Загружаем модели при старте приложения
     app_data["models"] = create_model_dict()
 
     yield
 
+    # Очищаем модели при завершении работы
     if "models" in app_data:
         del app_data["models"]
 
 
+# Создаем экземпляр FastAPI приложения с настройкой lifespan
 app = FastAPI(lifespan=lifespan)
 
 
 @app.get("/")
 async def root():
+    """
+    Главная страница сервера с информацией о доступных эндпоинтах.
+    
+    Returns:
+        HTMLResponse: HTML страница с описанием API
+    """
     return HTMLResponse(
         """
 <h1>Marker API</h1>

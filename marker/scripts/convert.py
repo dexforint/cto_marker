@@ -1,3 +1,14 @@
+"""
+CLI скрипт для batch конвертации документов.
+
+Основной скрипт для пакетной конвертации документов различных форматов
+в Markdown, HTML или JSON с использованием многопроцессорной обработки
+и поддержкой множественных GPU. Поддерживает оптимизацию памяти
+и автоматическое управление ресурсами.
+
+Автор: Marker Team
+"""
+
 import atexit
 import os
 import time
@@ -7,18 +18,19 @@ import torch
 
 from marker.utils.batch import get_batch_sizes_worker_counts
 
-# Ensure threads don't contend
+# Настройка переменных окружения для оптимизации производительности
+# Избегаем конкуренции между потоками
 os.environ["MKL_DYNAMIC"] = "FALSE"
 os.environ["OMP_DYNAMIC"] = "FALSE"
-os.environ["OMP_NUM_THREADS"] = "2"  # Avoid OpenMP issues with multiprocessing
+os.environ["OMP_NUM_THREADS"] = "2"  # Избегаем проблем с OpenMP при многопроцессорности
 os.environ["OPENBLAS_NUM_THREADS"] = "2"
 os.environ["MKL_NUM_THREADS"] = "2"
 os.environ["GRPC_VERBOSITY"] = "ERROR"
 os.environ["GLOG_minloglevel"] = "2"
 os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = (
-    "1"  # Transformers uses .isin for a simple op, which is not supported on MPS
+    "1"  # Transformers использует .isin для простой операции, не поддерживаемой на MPS
 )
-os.environ["IN_STREAMLIT"] = "true"  # Avoid multiprocessing inside surya
+os.environ["IN_STREAMLIT"] = "true"  # Избегаем многопроцессорности внутри surya
 
 import math
 import traceback
@@ -35,6 +47,7 @@ from marker.models import create_model_dict
 from marker.output import output_exists, save_output
 from marker.utils.gpu import GPUManager
 
+# Настройка системы логирования
 configure_logging()
 logger = get_logger()
 
