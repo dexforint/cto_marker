@@ -1,3 +1,18 @@
+"""
+Модуль рендеринга документов в HTML формат.
+
+Предоставляет рендерер для преобразования внутреннего представления документа
+в полноценный HTML с изображениями и метаданными. Поддерживает пагинацию,
+извлечение изображений и добавление block IDs для отслеживания.
+
+Основные возможности:
+- Преобразование документа в валидный HTML5
+- Извлечение изображений в виде файлов PIL
+- Поддержка пагинации по страницам
+- Добавление data-block-id атрибутов для отслеживания
+- Генерация метаданных документа и страниц
+"""
+
 import textwrap
 
 from PIL import Image
@@ -11,16 +26,24 @@ from marker.schema import BlockTypes
 from marker.schema.blocks import BlockId
 from marker.settings import settings
 
-# Ignore beautifulsoup warnings
+# Игнорируем предупреждения beautifulsoup
 import warnings
 
 warnings.filterwarnings("ignore", category=MarkupResemblesLocatorWarning)
 
-# Suppress DecompressionBombError
+# Подавляем ошибку DecompressionBombError для больших изображений
 Image.MAX_IMAGE_PIXELS = None
 
 
 class HTMLOutput(BaseModel):
+    """
+    Модель выходных данных HTML рендеринга.
+    
+    Атрибуты:
+        html: Полный HTML документ в виде строки
+        images: Словарь изображений {имя_файла: PIL.Image}
+        metadata: Метаданные документа (содержание, статистика страниц)
+    """
     html: str
     images: dict
     metadata: dict
@@ -28,7 +51,15 @@ class HTMLOutput(BaseModel):
 
 class HTMLRenderer(BaseRenderer):
     """
-    A renderer for HTML output.
+    Рендерер для преобразования документов в HTML формат.
+    
+    Создает полноценный HTML5 документ с изображениями, метаданными и опциональной
+    пагинацией. Изображения извлекаются как PIL.Image объекты для последующего
+    сохранения пользователем.
+    
+    Атрибуты:
+        page_blocks: Типы блоков, которые считаются страницами
+        paginate_output: Добавлять ли div обертки для страниц с data-page-id
     """
 
     page_blocks: Annotated[
@@ -41,7 +72,19 @@ class HTMLRenderer(BaseRenderer):
     ] = False
 
     def extract_image(self, document, image_id):
+        """
+        Извлекает изображение из документа как PIL.Image.
+        
+        Аргументы:
+            document: Документ для извлечения изображения
+            image_id: ID блока изображения
+            
+        Возвращает:
+            PIL.Image: Извлеченное изображение
+        """
+        # Получаем блок изображения
         image_block = document.get_block(image_id)
+        # Извлекаем в нужном качестве
         cropped = image_block.get_image(
             document, highres=self.image_extraction_mode == "highres"
         )
@@ -49,28 +92,40 @@ class HTMLRenderer(BaseRenderer):
 
     def insert_block_id(self, soup, block_id: BlockId):
         """
-        Insert a block ID into the soup as a data attribute.
+        Вставляет ID блока в soup как data атрибут.
+        
+        Добавляет data-block-id атрибут к внешнему тегу в soup для отслеживания
+        блоков в выходном HTML. Пропускает Line и Span блоки.
+        
+        Аргументы:
+            soup: BeautifulSoup объект для модификации
+            block_id: ID блока для вставки
+            
+        Возвращает:
+            BeautifulSoup: Модифицированный soup с block ID
         """
+        # Пропускаем Line и Span блоки (слишком детальные)
         if block_id.block_type in [BlockTypes.Line, BlockTypes.Span]:
             return soup
 
         if self.add_block_ids:
-            # Find the outermost tag (first tag that isn't a NavigableString)
+            # Находим самый внешний тег (первый тег который не NavigableString)
             outermost_tag = None
             for element in soup.contents:
                 if hasattr(element, "name") and element.name:
                     outermost_tag = element
                     break
 
-            # If we found an outermost tag, add the data-block-id attribute
+            # Если нашли внешний тег, добавляем атрибут data-block-id
             if outermost_tag:
                 outermost_tag["data-block-id"] = str(block_id)
 
-            # If soup only contains text or no tags, wrap in a span
+            # Если soup содержит только текст или нет тегов, оборачиваем в span
             elif soup.contents:
                 wrapper = soup.new_tag("span")
                 wrapper["data-block-id"] = str(block_id)
 
+                # Перемещаем все содержимое в wrapper
                 contents = list(soup.contents)
                 for content in contents:
                     content.extract()
@@ -79,8 +134,24 @@ class HTMLRenderer(BaseRenderer):
         return soup
 
     def extract_html(self, document, document_output, level=0):
+        """
+        Рекурсивно извлекает HTML из документа, обрабатывая content-ref теги.
+        
+        Заменяет content-ref теги на реальный контент или изображения,
+        добавляет block IDs и обертки для страниц при пагинации.
+        
+        Аргументы:
+            document: Документ для извлечения
+            document_output: Выходные данные рендеринга документа
+            level: Уровень рекурсии (0 = корневой уровень)
+            
+        Возвращает:
+            tuple: (HTML строка, словарь изображений {имя_файла: PIL.Image})
+        """
+        # Парсим HTML
         soup = BeautifulSoup(document_output.html, "html.parser")
 
+        # Находим все ссылки на дочерние блоки
         content_refs = soup.find_all("content-ref")
         ref_block_id = None
         images = {}
@@ -141,10 +212,23 @@ class HTMLRenderer(BaseRenderer):
         return output, images
 
     def __call__(self, document) -> HTMLOutput:
+        """
+        Рендерит документ в HTML формат.
+        
+        Аргументы:
+            document: Document для рендеринга
+            
+        Возвращает:
+            HTMLOutput: Объект с HTML, изображениями и метаданными
+        """
+        # Рендерим документ в BlockOutput структуру
         document_output = document.render(self.block_config)
+        # Извлекаем HTML и изображения
         full_html, images = self.extract_html(document, document_output)
+        # Форматируем HTML с отступами
         soup = BeautifulSoup(full_html, "html.parser")
-        full_html = soup.prettify()  # Add indentation to the HTML
+        full_html = soup.prettify()  # Добавляем отступы для читаемости
+        # Возвращаем результат
         return HTMLOutput(
             html=full_html,
             images=images,
