@@ -1,3 +1,20 @@
+"""
+Модуль рендеринга документов в Markdown формат.
+
+Предоставляет рендерер для преобразования документов в Markdown с поддержкой
+математических формул, таблиц, пагинации и изображений. Использует кастомный
+Markdownify конвертер для точного контроля над форматированием.
+
+Основные возможности:
+- Преобразование HTML в Markdown
+- Поддержка математических формул (inline и block)
+- Умная обработка таблиц (Markdown или HTML режим)
+- Пагинация с маркерами страниц
+- Обработка переносов слов (hyphenation)
+- Извлечение изображений
+- Настраиваемые delimiters для математики
+"""
+
 import re
 from collections import defaultdict
 from typing import Annotated, Tuple
@@ -17,17 +34,42 @@ logger = get_logger()
 
 
 def escape_dollars(text):
+    """Экранирует символы доллара для Markdown."""
     return text.replace("$", r"\$")
 
 
 def cleanup_text(full_text):
+    """
+    Очищает текст от избыточных переводов строк.
+    
+    Аргументы:
+        full_text: Текст для очистки
+        
+    Возвращает:
+        str: Очищенный текст
+    """
+    # Заменяем 3+ переводов строк на два
     full_text = re.sub(r"\n{3,}", "\n\n", full_text)
+    # Заменяем 3+ комбинаций \n\s на два перевода строки
     full_text = re.sub(r"(\n\s){3,}", "\n\n", full_text)
     return full_text.strip()
 
 
 def get_formatted_table_text(element):
+    """
+    Форматирует текст ячейки таблицы для Markdown.
+    
+    Обрабатывает NavigableString, br теги, math теги и другой контент,
+    экранируя доллары и добавляя пробелы.
+    
+    Аргументы:
+        element: BeautifulSoup элемент ячейки таблицы
+        
+    Возвращает:
+        str: Отформатированный текст ячейки
+    """
     text = []
+    # Обрабатываем содержимое ячейки
     for content in element.contents:
         if content is None:
             continue
@@ -56,6 +98,15 @@ def get_formatted_table_text(element):
 
 
 class Markdownify(MarkdownConverter):
+    """
+    Кастомный конвертер HTML в Markdown.
+    
+    Расширяет markdownify.MarkdownConverter для поддержки:
+    - Математических формул с кастомными delimiters
+    - Умной обработки таблиц (Markdown или HTML)
+    - Пагинации с маркерами страниц
+    - Обработки переносов слов (hyphenation)
+    """
     def __init__(
         self,
         paginate_output,
@@ -65,6 +116,17 @@ class Markdownify(MarkdownConverter):
         html_tables_in_markdown,
         **kwargs,
     ):
+        """
+        Инициализирует конвертер.
+        
+        Аргументы:
+            paginate_output: Добавлять ли маркеры пагинации
+            page_separator: Разделитель страниц (например, "---...")
+            inline_math_delimiters: Tuple delimiters для inline math (например, ("$", "$"))
+            block_math_delimiters: Tuple delimiters для block math (например, ("$", "$"))
+            html_tables_in_markdown: Возвращать ли таблицы как HTML вместо Markdown
+            **kwargs: Аргументы для MarkdownConverter
+        """
         super().__init__(**kwargs)
         self.paginate_output = paginate_output
         self.page_separator = page_separator
@@ -258,12 +320,32 @@ class Markdownify(MarkdownConverter):
 
 
 class MarkdownOutput(BaseModel):
+    """
+    Модель выходных данных Markdown рендеринга.
+    
+    Атрибуты:
+        markdown: Markdown текст документа
+        images: Словарь изображений {block_id: base64_image}
+        metadata: Метаданные документа
+    """
     markdown: str
     images: dict
     metadata: dict
 
 
 class MarkdownRenderer(HTMLRenderer):
+    """
+    Рендерер для преобразования документов в Markdown формат.
+    
+    Сначала преобразует документ в HTML (наследует HTMLRenderer),
+    затем конвертирует HTML в Markdown с помощью кастомного Markdownify.
+    
+    Атрибуты:
+        page_separator: Разделитель между страницами (по умолчанию 48 дефисов)
+        inline_math_delimiters: Delimiters для inline математики (по умолчанию "$")
+        block_math_delimiters: Delimiters для block математики (по умолчанию "$")
+        html_tables_in_markdown: Возвращать ли таблицы как HTML вместо Markdown
+    """
     page_separator: Annotated[
         str, "The separator to use between pages.", "Default is '-' * 48."
     ] = "-" * 48
@@ -272,42 +354,64 @@ class MarkdownRenderer(HTMLRenderer):
     ] = ("$", "$")
     block_math_delimiters: Annotated[
         Tuple[str], "The delimiters to use for block math."
-    ] = ("$$", "$$")
+    ] = ("$", "$")
     html_tables_in_markdown: Annotated[
         bool, "Return tables formatted as HTML, instead of in markdown"
     ] = False
 
     @property
     def md_cls(self):
+        """
+        Создает экземпляр Markdownify конвертера с настройками.
+        
+        Возвращает:
+            Markdownify: Настроенный конвертер HTML в Markdown
+        """
         return Markdownify(
             self.paginate_output,
             self.page_separator,
-            heading_style="ATX",
-            bullets="-",
+            heading_style="ATX",  # Стиль заголовков с #
+            bullets="-",  # Символ для списков
             escape_misc=False,
-            escape_underscores=True,
-            escape_asterisks=True,
-            escape_dollars=True,
-            sub_symbol="<sub>",
-            sup_symbol="<sup>",
+            escape_underscores=True,  # Экранировать _
+            escape_asterisks=True,  # Экранировать *
+            escape_dollars=True,  # Экранировать $
+            sub_symbol="<sub>",  # Сохранять <sub> как HTML
+            sup_symbol="<sup>",  # Сохранять <sup> как HTML
             inline_math_delimiters=self.inline_math_delimiters,
             block_math_delimiters=self.block_math_delimiters,
             html_tables_in_markdown=self.html_tables_in_markdown
         )
 
     def __call__(self, document: Document) -> MarkdownOutput:
+        """
+        Рендерит документ в Markdown формат.
+        
+        Аргументы:
+            document: Document для рендеринга
+            
+        Возвращает:
+            MarkdownOutput: Объект с Markdown, изображениями и метаданными
+        """
+        # Рендерим документ в BlockOutput структуру
         document_output = document.render(self.block_config)
+        # Извлекаем HTML и изображения (через HTMLRenderer)
         full_html, images = self.extract_html(document, document_output)
+        # Конвертируем HTML в Markdown
         markdown = self.md_cls.convert(full_html)
+        # Очищаем избыточные переводы строк
         markdown = cleanup_text(markdown)
 
-        # Ensure we set the correct blanks for pagination markers
+        # Гарантируем правильные пробелы для маркеров пагинации
         if self.paginate_output:
+            # Добавляем начальные переводы строк если их нет
             if not markdown.startswith("\n\n"):
                 markdown = "\n\n" + markdown
+            # Добавляем конечные переводы строк если markdown заканчивается разделителем
             if markdown.endswith(self.page_separator):
                 markdown += "\n\n"
 
+        # Возвращаем результат
         return MarkdownOutput(
             markdown=markdown,
             images=images,

@@ -1,3 +1,18 @@
+"""
+Модуль рендеринга OCR данных в JSON формат.
+
+Предоставляет рендерер для преобразования низкоуровневых OCR данных
+(символы, строки, страницы) в JSON формат с координатами. Используется
+для получения детализированной информации об OCR распознавании.
+
+Основные возможности:
+- Сохранение иерархии Page -> Line -> Char
+- Координаты polygon и bbox для каждого элемента
+- Текст каждого символа
+- HTML представление строк
+- Исключение duplicate lines из уравнений
+"""
+
 from typing import Annotated, List, Tuple
 
 from pydantic import BaseModel
@@ -8,6 +23,16 @@ from marker.schema.document import Document
 
 
 class OCRJSONCharOutput(BaseModel):
+    """
+    Модель JSON представления символа OCR.
+    
+    Атрибуты:
+        id: ID блока символа
+        block_type: Тип блока (всегда "Char")
+        text: Распознанный текст символа
+        polygon: Координаты полигона символа
+        bbox: Ограничивающий прямоугольник
+    """
     id: str
     block_type: str
     text: str
@@ -16,6 +41,17 @@ class OCRJSONCharOutput(BaseModel):
 
 
 class OCRJSONLineOutput(BaseModel):
+    """
+    Модель JSON представления строки OCR.
+    
+    Атрибуты:
+        id: ID блока строки
+        block_type: Тип блока (обычно "Line" или "Equation")
+        html: HTML представление строки
+        polygon: Координаты полигона строки
+        bbox: Ограничивающий прямоугольник
+        children: Список символов (OCRJSONCharOutput)
+    """
     id: str
     block_type: str
     html: str
@@ -25,6 +61,16 @@ class OCRJSONLineOutput(BaseModel):
 
 
 class OCRJSONPageOutput(BaseModel):
+    """
+    Модель JSON представления страницы OCR.
+    
+    Атрибуты:
+        id: ID блока страницы
+        block_type: Тип блока (всегда "Page")
+        polygon: Координаты полигона страницы
+        bbox: Ограничивающий прямоугольник
+        children: Список строк (OCRJSONLineOutput)
+    """
     id: str
     block_type: str
     polygon: List[List[float]]
@@ -33,6 +79,14 @@ class OCRJSONPageOutput(BaseModel):
 
 
 class OCRJSONOutput(BaseModel):
+    """
+    Модель выходных данных OCR JSON рендеринга.
+    
+    Атрибуты:
+        children: Список страниц документа
+        block_type: Тип корневого блока (всегда "Document")
+        metadata: Метаданные (опционально)
+    """
     children: List[OCRJSONPageOutput]
     block_type: str = str(BlockTypes.Document)
     metadata: dict | None = None
@@ -40,7 +94,14 @@ class OCRJSONOutput(BaseModel):
 
 class OCRJSONRenderer(BaseRenderer):
     """
-    A renderer for OCR JSON output.
+    Рендерер для преобразования OCR данных в JSON формат.
+    
+    Извлекает детальные OCR данные на уровне символов, строк и страниц.
+    Полезно для анализа качества OCR и постобработки.
+    
+    Атрибуты:
+        image_blocks: Типы блоков изображений (не используется в OCR режиме)
+        page_blocks: Типы блоков страниц
     """
 
     image_blocks: Annotated[
@@ -53,7 +114,20 @@ class OCRJSONRenderer(BaseRenderer):
     ] = (BlockTypes.Page,)
 
     def extract_json(self, document: Document) -> List[OCRJSONPageOutput]:
+        """
+        Извлекает OCR JSON данные из документа.
+        
+        Обрабатывает каждую страницу, извлекая строки и символы.
+        Исключает дубликаты строк из уравнений (они уже включены в Equation блоки).
+        
+        Аргументы:
+            document: Документ для извлечения OCR данных
+            
+        Возвращает:
+            List[OCRJSONPageOutput]: Список страниц с OCR данными
+        """
         pages = []
+        # Обрабатываем каждую страницу документа
         for page in document.pages:
             page_equations = [
                 b for b in page.children if b.block_type == BlockTypes.Equation
@@ -131,4 +205,13 @@ class OCRJSONRenderer(BaseRenderer):
         return pages
 
     def __call__(self, document: Document) -> OCRJSONOutput:
+        """
+        Рендерит документ в OCR JSON формат.
+        
+        Аргументы:
+            document: Document для рендеринга
+            
+        Возвращает:
+            OCRJSONOutput: Объект с OCR данными
+        """
         return OCRJSONOutput(children=self.extract_json(document), metadata=None)
