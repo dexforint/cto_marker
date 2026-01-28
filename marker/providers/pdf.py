@@ -1,3 +1,13 @@
+"""
+Провайдер для обработки PDF файлов.
+
+Модуль предоставляет PdfProvider, который обрабатывает PDF документы,
+извлекает текст, изображения, ссылки и метаданные. Использует библиотеку
+pypdfium2 для низкоуровневой работы с PDF и pdftext для извлечения текста.
+
+Автор: Marker Team
+"""
+
 import contextlib
 import ctypes
 import logging
@@ -22,63 +32,86 @@ from marker.schema.registry import get_block_class
 from marker.schema.text.line import Line
 from marker.schema.text.span import Span
 
-# Ignore pypdfium2 warning about form flattening
+# Игнорируем предупреждения pypdfium2 о выравнивании форм
 logging.getLogger("pypdfium2").setLevel(logging.ERROR)
 
 
 class PdfProvider(BaseProvider):
     """
-    A provider for PDF files.
+    Провайдер для обработки PDF файлов.
+    
+    Основной провайдер для работы с PDF документами, который предоставляет
+    полный функционал для извлечения текста, изображений, ссылок и метаданных.
+    Использует библиотеку pypdfium2 для низкоуровневой работы с PDF
+    и pdftext для продвинутого извлечения текста.
+    
+    Атрибуты:
+        page_range (List[int]): Диапазон страниц для обработки
+        pdftext_workers (int): Количество воркеров для pdftext
+        flatten_pdf (bool): Выравнивать ли структуру PDF
+        force_ocr (bool): Принудительно использовать OCR для всего документа
     """
 
+    # Диапазон страниц для обработки (по умолчанию все страницы)
     page_range: Annotated[
         List[int],
-        "The range of pages to process.",
-        "Default is None, which will process all pages.",
+        "Диапазон страниц для обработки.",
+        "По умолчанию None, что означает обработку всех страниц.",
     ] = None
+    # Количество воркеров для pdftext (параллельная обработка)
     pdftext_workers: Annotated[
         int,
-        "The number of workers to use for pdftext.",
+        "Количество воркеров для pdftext.",
     ] = 4
+    # Выравнивать ли структуру PDF для упрощения обработки
     flatten_pdf: Annotated[
         bool,
-        "Whether to flatten the PDF structure.",
+        "Выравнивать ли структуру PDF.",
     ] = True
+    # Принудительно использовать OCR для всего документа
     force_ocr: Annotated[
         bool,
-        "Whether to force OCR on the whole document.",
+        "Принудительно использовать OCR для всего документа.",
     ] = False
+    # Символы, считающиеся недопустимыми для OCR
     ocr_invalid_chars: Annotated[
         tuple,
-        "The characters to consider invalid for OCR.",
+        "Символы, считающиеся недопустимыми для OCR.",
     ] = (chr(0xFFFD), "�")
+    # Минимальное соотношение пробелов к не-пробелам для определения плохого текста
     ocr_space_threshold: Annotated[
         float,
-        "The minimum ratio of spaces to non-spaces to detect bad text.",
+        "Минимальное соотношение пробелов к не-пробелам для определения плохого текста.",
     ] = 0.7
+    # Минимальное соотношение переносов строк к не-переносам для определения плохого текста
     ocr_newline_threshold: Annotated[
         float,
-        "The minimum ratio of newlines to non-newlines to detect bad text.",
+        "Минимальное соотношение переносов строк к не-переносам для определения плохого текста.",
     ] = 0.6
+    # Минимальное соотношение алфавитно-цифровых символов для их учета
     ocr_alphanum_threshold: Annotated[
         float,
-        "The minimum ratio of alphanumeric characters to non-alphanumeric characters to consider an alphanumeric character.",
+        "Минимальное соотношение алфавитно-цифровых символов для их учета.",
     ] = 0.3
+    # Минимальное покрытие страницы изображением для пропуска страницы
     image_threshold: Annotated[
         float,
-        "The minimum coverage ratio of the image to the page to consider skipping the page.",
+        "Минимальное покрытие страницы изображением для пропуска страницы.",
     ] = 0.65
+    # Удалять ли существующий OCR текст из PDF
     strip_existing_ocr: Annotated[
         bool,
-        "Whether to strip existing OCR text from the PDF.",
+        "Удалять ли существующий OCR текст из PDF.",
     ] = False
+    # Отключать ли ссылки
     disable_links: Annotated[
         bool,
-        "Whether to disable links.",
+        "Отключать ли ссылки.",
     ] = False
+    # Сохранять ли информацию о символах в выводе
     keep_chars: Annotated[
         bool,
-        "Whether to keep character-level information in the output.",
+        "Сохранять ли информацию о символах в выводе.",
     ] = False
 
     def __init__(self, filepath: str, config=None):
