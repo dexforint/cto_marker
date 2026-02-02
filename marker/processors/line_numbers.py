@@ -1,3 +1,6 @@
+# Процессор для обнаружения и игнорирования номеров строк
+# Идентифицирует номера строк в документах и помечает их для игнорирования
+
 from typing import Annotated
 
 from marker.processors import BaseProcessor

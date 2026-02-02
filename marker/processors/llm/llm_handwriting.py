@@ -1,3 +1,6 @@
+# LLM процессор для распознавания рукописного текста
+# Использует LLM для улучшения распознавания рукописного содержимого
+
 import markdown2
 from pydantic import BaseModel
 from marker.processors.llm import PromptData, BaseLLMSimpleBlockProcessor, BlockData

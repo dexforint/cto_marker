@@ -1,3 +1,6 @@
+# LLM процессор для распознавания математических уравнений
+# Использует LLM для улучшения распознавания и форматирования математических формул
+
 from pydantic import BaseModel
 
 from marker.processors.llm import BaseLLMSimpleBlockProcessor, PromptData, BlockData

@@ -1,3 +1,6 @@
+# LLM процессор для обработки сложных регионов
+# Использует LLM для улучшения распознавания сложных областей с mixed content
+
 from typing import List
 
 import markdown2

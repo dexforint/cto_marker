@@ -1,3 +1,6 @@
+# LLM процессор для обработки математических блоков
+# Использует LLM для распознавания сложных математических выражений и формул
+
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List, Tuple, Annotated
 

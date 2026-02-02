@@ -1,3 +1,6 @@
+# LLM процессор для обработки форм
+# Использует LLM для извлечения структурированных данных из форм и документов
+
 from typing import List
 
 from pydantic import BaseModel

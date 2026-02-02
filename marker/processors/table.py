@@ -1,3 +1,6 @@
+# Процессор для распознавания и обработки таблиц
+# Выполняет OCR таблиц и извлекает структурированные данные
+
 import re
 from collections import defaultdict
 from copy import deepcopy
