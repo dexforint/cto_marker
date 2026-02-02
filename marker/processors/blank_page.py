@@ -1,3 +1,6 @@
+# Модуль процессора пустых страниц
+# Удаляет пустые страницы, которые распознались как один большой блок Picture/Figure
+
 from typing import Annotated
 
 from PIL import Image
@@ -16,7 +19,11 @@ logger = get_logger()
 
 class BlankPageProcessor(BaseProcessor):
     """
-    A processor to filter out blank pages detected as a single layout block
+    Процессор для фильтрации пустых страниц.
+
+    Иногда сканы пустых/почти пустых страниц распознаются как единственный крупный Picture/Figure блок.
+    Процессор анализирует изображение блока: если оно практически пустое (нет текста/контента),
+    то блок удаляется из структуры страницы.
     """
 
     full_page_block_intersection_threshold: Annotated[
