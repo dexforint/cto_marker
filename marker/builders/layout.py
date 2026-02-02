@@ -79,11 +79,6 @@ class LayoutBuilder(BaseBuilder):
         self.layout_model = layout_model
         super().__init__(config)
 
-    def __init__(self, layout_model: LayoutPredictor, config=None):
-        self.layout_model = layout_model
-
-        super().__init__(config)
-
     def __call__(self, document: Document, provider: PdfProvider):
         if self.force_layout_block is not None:
             # Assign the full content of every page to a single layout type
