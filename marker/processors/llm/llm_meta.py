@@ -1,3 +1,6 @@
+# Мета-процессор LLM для управления простыми LLM процессорами
+# Объединяет несколько LLM процессоров и управляет их выполнением
+
 from concurrent.futures import ThreadPoolExecutor
 from typing import List, Dict, Any
 

@@ -1,3 +1,6 @@
+# LLM процессор для обработки таблиц
+# Использует LLM для улучшения распознавания структуры таблиц
+
 from typing import Annotated, List, Tuple
 
 from bs4 import BeautifulSoup

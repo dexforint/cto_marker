@@ -1,3 +1,6 @@
+# Модуль LLM процессоров
+# Содержит базовые классы и утилиты для процессоров, использующих LLM
+
 import json
 import traceback
 from concurrent.futures import ThreadPoolExecutor, as_completed

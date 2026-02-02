@@ -1,3 +1,6 @@
+# LLM процессор для генерации описаний изображений
+# Использует LLM для создания текстовых описаний изображений и диаграмм
+
 from pydantic import BaseModel
 
 from marker.processors.llm import PromptData, BaseLLMSimpleBlockProcessor, BlockData

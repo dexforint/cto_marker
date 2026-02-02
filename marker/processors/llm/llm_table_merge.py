@@ -1,3 +1,6 @@
+# LLM процессор для объединения таблиц
+# Использует LLM для объединения разделенных таблиц в единые структуры
+
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Annotated, List, Tuple, Literal
 

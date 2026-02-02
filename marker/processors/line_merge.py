@@ -1,3 +1,6 @@
+# Процессор для объединения строк текста
+# Объединяет близко расположенные строки в единый текстовый блок
+
 from typing import Annotated, List
 
 from marker.processors import BaseProcessor
