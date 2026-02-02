@@ -1,3 +1,6 @@
+# Модуль процессора переклассификации блоков
+# Позволяет заменить тип одного блока на другой, если уверенность модели ниже порога
+
 from copy import deepcopy
 from typing import Annotated
 
@@ -12,10 +15,13 @@ logger = get_logger()
 
 class BlockRelabelProcessor(BaseProcessor):
     """
-    A processor to heuristically relabel blocks based on a confidence threshold.
-    
-    Each rule in the relabel string maps an original block label to a new one
-    if the confidence exceeds a given threshold.
+    Процессор для эвристической переклассификации блоков.
+
+    Некоторые типы блоков могут распознаваться моделью layout detection с ошибками.
+    Этот процессор позволяет задать правила переклассификации в формате:
+    "OriginalType:NewType:ConfidenceThreshold", например "Table:Picture:0.85".
+
+    Если уверенность модели в типе OriginalType ниже порога, блок переклассифицируется в NewType.
     """
     
     block_relabel_str: Annotated[

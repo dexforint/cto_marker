@@ -1,3 +1,6 @@
+# Модуль процессора упорядочивания блоков
+# Сортирует блоки по позициям span'ов на странице, если layout image был разрезан (sliced)
+
 from statistics import mean
 from collections import defaultdict
 
@@ -8,7 +11,11 @@ from marker.schema.document import Document
 
 class OrderProcessor(BaseProcessor):
     """
-    A processor for sorting the blocks in order if needed.  This can help when the layout image was sliced.
+    Процессор для сортировки блоков на странице в правильном порядке.
+
+    Когда layout image был разрезан (layout_sliced = True), порядок блоков в структуре
+    может не совпадать с порядком чтения. Этот процессор использует позиции span'ов
+    (minimum_position, maximum_position) из оригинального PDF, чтобы восстановить корректный порядок.
     """
     block_types = tuple()
 

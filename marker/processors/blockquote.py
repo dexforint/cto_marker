@@ -1,3 +1,6 @@
+# Модуль процессора блочных цитат (blockquote)
+# Определяет цитаты по отступам и выравниванию блоков относительно друг друга
+
 from typing import Annotated, Tuple
 
 from marker.processors import BaseProcessor
@@ -7,7 +10,11 @@ from marker.schema.document import Document
 
 class BlockquoteProcessor(BaseProcessor):
     """
-    A processor for tagging blockquotes.
+    Процессор для определения блочных цитат.
+
+    Эвристика: если следующий текстовый блок сдвинут вправо (имеет отступ) и расположен ниже,
+    то он может быть началом или продолжением blockquote. Уровень вложенности цитаты
+    определяется последовательными отступами.
     """
     block_types: Annotated[
         Tuple[BlockTypes],
@@ -30,9 +37,26 @@ class BlockquoteProcessor(BaseProcessor):
     ] = 0.01
 
     def __init__(self, config):
+        """
+        Инициализирует процессор blockquote.
+
+        Аргументы:
+            config: Конфигурация процессора (пороги отступов и допуски)
+        """
         super().__init__(config)
 
     def __call__(self, document: Document):
+        """
+        Проставляет флаги blockquote/blockqoute_level для текстовых блоков.
+
+        Для каждого текстового блока ищет следующий блок и проверяет:
+        - совпадение правой/левой границы (выравнивание)
+        - наличие горизонтального отступа
+        - смещение по вертикали (новая строка/абзац)
+
+        Аргументы:
+            document: Документ для обработки
+        """
         for page in document.pages:
             for block in page.contained_blocks(document, self.block_types):
                 if block.structure is None:

@@ -1,3 +1,8 @@
+# Модуль процессора списков
+# Обрабатывает группы списков (ListGroup):
+# - помечает продолжение списков между колонками/страницами
+# - вычисляет уровни вложенности элементов списка по отступам
+
 from typing import Annotated, List, Tuple
 
 from marker.processors import BaseProcessor
@@ -8,7 +13,12 @@ from marker.schema.document import Document
 
 class ListProcessor(BaseProcessor):
     """
-    A processor for merging lists across pages and columns
+    Процессор для обработки списков и их структуры.
+
+    Основные функции:
+    1. Определяет продолжение списка между колонками и страницами и выставляет has_continuation
+    2. По координатам элементов списка вычисляет уровни вложенности (list_indent_level)
+       и перестраивает иерархию list items внутри ListGroup
     """
     block_types = (BlockTypes.ListGroup,)
     ignored_block_types: Annotated[
