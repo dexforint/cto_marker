@@ -1,0 +1,527 @@
+Missing Docstrings Report
+================================================================================
+
+Total: 323 functions/classes missing docstrings
+Files: 66
+
+
+marker/builders/layout.py (6 missing):
+--------------------------------------------------------------------------------
+  Line   82: function '__call__'
+  Line   91: function 'get_batch_size'
+  Line   98: function 'forced_layout'
+  Line  117: function 'surya_layout'
+  Line  125: function 'expand_layout_blocks'
+  Line  162: function 'add_blocks_to_pages'
+
+marker/processors/blank_page.py (2 missing):
+--------------------------------------------------------------------------------
+  Line   36: function 'is_blank'
+  Line   62: function '__call__'
+
+marker/processors/block_relabel.py (2 missing):
+--------------------------------------------------------------------------------
+  Line   34: function '__init__'
+  Line   64: function '__call__'
+
+marker/processors/debug.py (7 missing):
+--------------------------------------------------------------------------------
+  Line   44: function '__call__'
+  Line   65: function 'draw_pdf_debug_images'
+  Line   99: function 'draw_layout_debug_images'
+  Line  133: function 'render_layout_boxes'
+  Line  165: function 'dump_block_debug_data'
+  Line  183: function 'get_text_size'
+  Line  189: function 'render_on_image'
+
+marker/processors/equation.py (2 missing):
+--------------------------------------------------------------------------------
+  Line  137: function 'fix_latex'
+  Line  163: function 'get_latex_batched'
+
+marker/processors/line_merge.py (3 missing):
+--------------------------------------------------------------------------------
+  Line   44: function '__init__'
+  Line   47: function 'merge_lines'
+  Line  119: function '__call__'
+
+marker/processors/line_numbers.py (5 missing):
+--------------------------------------------------------------------------------
+  Line   35: function '__init__'
+  Line   38: function '__call__'
+  Line   43: function 'ignore_line_number_spans'
+  Line   64: function 'ignore_line_number_blocks'
+  Line   79: function 'ignore_line_starts_ends'
+
+marker/processors/list.py (4 missing):
+--------------------------------------------------------------------------------
+  Line   33: function '__init__'
+  Line   36: function '__call__'
+  Line   40: function 'list_group_continuation'
+  Line   67: function 'list_group_indentation'
+
+marker/processors/llm/__init__.py (14 missing):
+--------------------------------------------------------------------------------
+  Line   26: class    'PromptData'
+  Line   35: class    'BlockData'
+  Line   63: function '__init__'
+  Line   72: function 'extract_image'
+  Line  110: function 'load_blocks'
+  Line  113: function 'handle_rewrites'
+  Line  140: function '__call__'
+  Line  149: function 'process_rewriting'
+  Line  152: function 'rewrite_blocks'
+  Line  186: function '__init__'
+  Line  189: function '__call__'
+  Line  196: function 'inference_blocks'
+  Line  203: function 'block_prompts'
+  Line  206: function 'rewrite_block'
+
+marker/processors/llm/llm_complex.py (4 missing):
+--------------------------------------------------------------------------------
+  Line   15: class    'LLMComplexRegionProcessor'
+  Line   95: class    'ComplexSchema'
+  Line   57: function 'block_prompts'
+  Line   72: function 'rewrite_block'
+
+marker/processors/llm/llm_equation.py (5 missing):
+--------------------------------------------------------------------------------
+  Line   13: class    'LLMEquationProcessor'
+  Line  133: class    'EquationSchema'
+  Line   74: function 'inference_blocks'
+  Line   90: function 'block_prompts'
+  Line  109: function 'rewrite_block'
+
+marker/processors/llm/llm_form.py (5 missing):
+--------------------------------------------------------------------------------
+  Line   15: class    'LLMFormProcessor'
+  Line  119: class    'FormSchema'
+  Line   68: function 'inference_blocks'
+  Line   80: function 'block_prompts'
+  Line   97: function 'rewrite_block'
+
+marker/processors/llm/llm_handwriting.py (5 missing):
+--------------------------------------------------------------------------------
+  Line   14: class    'LLMHandwritingProcessor'
+  Line   87: class    'HandwritingSchema'
+  Line   39: function 'inference_blocks'
+  Line   55: function 'block_prompts'
+  Line   71: function 'rewrite_block'
+
+marker/processors/llm/llm_image_description.py (5 missing):
+--------------------------------------------------------------------------------
+  Line   14: class    'LLMImageDescriptionProcessor'
+  Line   89: class    'ImageSchema'
+  Line   45: function 'inference_blocks'
+  Line   51: function 'block_prompts'
+  Line   72: function 'rewrite_block'
+
+marker/processors/llm/llm_mathblock.py (6 missing):
+--------------------------------------------------------------------------------
+  Line   19: class    'LLMMathBlockProcessor'
+  Line  201: class    'LLMTextSchema'
+  Line   79: function 'rewrite_blocks'
+  Line  164: function 'get_block_text'
+  Line  169: function 'get_block_lines'
+  Line  174: function 'process_rewriting'
+
+marker/processors/llm/llm_meta.py (3 missing):
+--------------------------------------------------------------------------------
+  Line   22: function '__init__'
+  Line   31: function '__call__'
+  Line   70: function 'get_response'
+
+marker/processors/llm/llm_page_correction.py (9 missing):
+--------------------------------------------------------------------------------
+  Line   35: class    'LLMPageCorrectionProcessor'
+  Line  299: class    'BlockSchema'
+  Line  305: class    'PageSchema'
+  Line  141: function 'get_selected_blocks'
+  Line  153: function 'process_rewriting'
+  Line  186: function 'load_blocks'
+  Line  190: function 'handle_reorder'
+  Line  250: function 'handle_rewrites'
+  Line  271: function 'rewrite_blocks'
+
+marker/processors/llm/llm_sectionheader.py (7 missing):
+--------------------------------------------------------------------------------
+  Line   20: class    'LLMSectionHeaderProcessor'
+  Line  170: class    'BlockSchema'
+  Line  175: class    'SectionHeaderSchema'
+  Line  102: function 'get_selected_blocks'
+  Line  114: function 'process_rewriting'
+  Line  144: function 'load_blocks'
+  Line  148: function 'rewrite_blocks'
+
+marker/processors/llm/llm_table.py (7 missing):
+--------------------------------------------------------------------------------
+  Line   21: class    'LLMTableProcessor'
+  Line  326: class    'TableSchema'
+  Line   97: function 'handle_image_rotation'
+  Line  124: function 'process_rewriting'
+  Line  191: function 'rewrite_single_chunk'
+  Line  246: function 'get_cell_text'
+  Line  252: function 'parse_html_table'
+
+marker/processors/llm/llm_table_merge.py (9 missing):
+--------------------------------------------------------------------------------
+  Line   20: class    'LLMTableMergeProcessor'
+  Line  347: class    'MergeSchema'
+  Line  130: function 'get_row_count'
+  Line  145: function 'get_column_count'
+  Line  159: function 'rewrite_blocks'
+  Line  247: function 'process_rewriting'
+  Line  298: function 'validate_merge'
+  Line  311: function 'join_cells'
+  Line  327: function 'join_images'
+
+marker/processors/order.py (1 missing):
+--------------------------------------------------------------------------------
+  Line   22: function '__call__'
+
+marker/processors/sectionheader.py (2 missing):
+--------------------------------------------------------------------------------
+  Line   41: function '__call__'
+  Line   72: function 'bucket_headings'
+
+marker/processors/table.py (15 missing):
+--------------------------------------------------------------------------------
+  Line   75: function '__init__'
+  Line   88: function '__call__'
+  Line  190: function 'finalize_cell_text'
+  Line  225: function 'normalize_spaces'
+  Line  237: function 'combine_dollar_column'
+  Line  315: function 'split_combined_rows'
+  Line  430: function 'assign_text_to_cells'
+  Line  460: function 'assign_pdftext_lines'
+  Line  501: function 'align_table_cells'
+  Line  572: function 'needs_ocr'
+  Line  607: function 'get_ocr_results'
+  Line  674: function 'assign_ocr_lines'
+  Line  699: function 'get_table_rec_batch_size'
+  Line  708: function 'get_recognition_batch_size'
+  Line  717: function 'get_detection_batch_size'
+
+marker/providers/document.py (1 missing):
+--------------------------------------------------------------------------------
+  Line  155: function 'convert_image'
+
+marker/providers/pdf.py (13 missing):
+--------------------------------------------------------------------------------
+  Line  117: function '__init__'
+  Line  143: function 'get_doc'
+  Line  160: function 'font_flags_to_format'
+  Line  211: function 'font_names_to_format'
+  Line  223: function 'normalize_spaces'
+  Line  235: function 'pdftext_extraction'
+  Line  339: function 'check_line_spans'
+  Line  354: function 'check_page'
+  Line  412: function 'detect_bad_ocr'
+  Line  448: function 'get_images'
+  Line  455: function 'get_page_bbox'
+  Line  460: function 'get_page_lines'
+  Line  463: function 'get_page_refs'
+
+marker/renderers/__init__.py (1 missing):
+--------------------------------------------------------------------------------
+  Line  177: function 'replace_whitespace'
+
+marker/renderers/markdown.py (9 missing):
+--------------------------------------------------------------------------------
+  Line  137: function 'convert_div'
+  Line  148: function 'convert_p'
+  Line  163: function 'convert_math'
+  Line  182: function 'convert_table'
+  Line  282: function 'convert_a'
+  Line  288: function 'convert_span'
+  Line  294: function 'escape'
+  Line  300: function 'process_text'
+  Line  249: function 'add_header_line'
+
+marker/schema/blocks/base.py (27 missing):
+--------------------------------------------------------------------------------
+  Line   20: class    'BlockMetadata'
+  Line   37: class    'BlockOutput'
+  Line   45: class    'BlockId'
+  Line   87: class    'Block'
+  Line   28: function 'merge'
+  Line   76: function 'validate_block_type'
+  Line   83: function 'to_path'
+  Line  112: function 'id'
+  Line  118: function 'from_block'
+  Line  122: function 'set_internal_metadata'
+  Line  127: function 'get_internal_metadata'
+  Line  132: function 'get_image'
+  Line  154: function 'structure_blocks'
+  Line  159: function 'get_prev_block'
+  Line  176: function 'get_next_block'
+  Line  195: function 'add_structure'
+  Line  201: function 'update_structure_item'
+  Line  208: function 'remove_structure_items'
+  Line  212: function 'raw_text'
+  Line  231: function 'assemble_html'
+  Line  251: function 'assign_section_hierarchy'
+  Line  261: function 'contained_blocks'
+  Line  279: function 'replace_block'
+  Line  286: function 'render'
+  Line  322: function 'line_height'
+  Line  328: function 'update_metadata'
+  Line  341: function 'handle_html_output'
+
+marker/schema/blocks/basetable.py (3 missing):
+--------------------------------------------------------------------------------
+  Line   13: class    'BaseTable'
+  Line   24: function 'format_cells'
+  Line   57: function 'assemble_html'
+
+marker/schema/blocks/caption.py (2 missing):
+--------------------------------------------------------------------------------
+  Line   10: class    'Caption'
+  Line   18: function 'assemble_html'
+
+marker/schema/blocks/code.py (2 missing):
+--------------------------------------------------------------------------------
+  Line   12: class    'Code'
+  Line   20: function 'assemble_html'
+
+marker/schema/blocks/complexregion.py (2 missing):
+--------------------------------------------------------------------------------
+  Line   11: class    'ComplexRegion'
+  Line   17: function 'assemble_html'
+
+marker/schema/blocks/equation.py (2 missing):
+--------------------------------------------------------------------------------
+  Line   10: class    'Equation'
+  Line   16: function 'assemble_html'
+
+marker/schema/blocks/figure.py (2 missing):
+--------------------------------------------------------------------------------
+  Line   10: class    'Figure'
+  Line   17: function 'assemble_html'
+
+marker/schema/blocks/footnote.py (2 missing):
+--------------------------------------------------------------------------------
+  Line   10: class    'Footnote'
+  Line   19: function 'assemble_html'
+
+marker/schema/blocks/form.py (1 missing):
+--------------------------------------------------------------------------------
+  Line   13: class    'Form'
+
+marker/schema/blocks/handwriting.py (2 missing):
+--------------------------------------------------------------------------------
+  Line   10: class    'Handwriting'
+  Line   17: function 'assemble_html'
+
+marker/schema/blocks/inlinemath.py (2 missing):
+--------------------------------------------------------------------------------
+  Line   11: class    'InlineMath'
+  Line   20: function 'assemble_html'
+
+marker/schema/blocks/listitem.py (3 missing):
+--------------------------------------------------------------------------------
+  Line   12: function 'replace_bullets'
+  Line   28: class    'ListItem'
+  Line   35: function 'assemble_html'
+
+marker/schema/blocks/pagefooter.py (2 missing):
+--------------------------------------------------------------------------------
+  Line   10: class    'PageFooter'
+  Line   20: function 'assemble_html'
+
+marker/schema/blocks/pageheader.py (2 missing):
+--------------------------------------------------------------------------------
+  Line   10: class    'PageHeader'
+  Line   20: function 'assemble_html'
+
+marker/schema/blocks/picture.py (2 missing):
+--------------------------------------------------------------------------------
+  Line   10: class    'Picture'
+  Line   17: function 'assemble_html'
+
+marker/schema/blocks/reference.py (2 missing):
+--------------------------------------------------------------------------------
+  Line   10: class    'Reference'
+  Line   17: function 'assemble_html'
+
+marker/schema/blocks/sectionheader.py (2 missing):
+--------------------------------------------------------------------------------
+  Line   12: class    'SectionHeader'
+  Line   19: function 'assemble_html'
+
+marker/schema/blocks/table.py (1 missing):
+--------------------------------------------------------------------------------
+  Line   11: class    'Table'
+
+marker/schema/blocks/tablecell.py (3 missing):
+--------------------------------------------------------------------------------
+  Line   12: class    'TableCell'
+  Line   24: function 'text'
+  Line   28: function 'assemble_html'
+
+marker/schema/blocks/text.py (2 missing):
+--------------------------------------------------------------------------------
+  Line   10: class    'Text'
+  Line   19: function 'assemble_html'
+
+marker/schema/blocks/toc.py (1 missing):
+--------------------------------------------------------------------------------
+  Line   11: class    'TableOfContents'
+
+marker/schema/document.py (12 missing):
+--------------------------------------------------------------------------------
+  Line   17: class    'DocumentOutput'
+  Line   25: class    'TocItem'
+  Line   34: class    'Document'
+  Line   43: function 'get_block'
+  Line   52: function 'get_page'
+  Line   61: function 'get_next_block'
+  Line   83: function 'get_next_page'
+  Line   91: function 'get_prev_block'
+  Line  103: function 'get_prev_page'
+  Line  111: function 'assemble_html'
+  Line  122: function 'render'
+  Line  137: function 'contained_blocks'
+
+marker/schema/groups/base.py (1 missing):
+--------------------------------------------------------------------------------
+  Line   10: class    'Group'
+
+marker/schema/groups/figure.py (2 missing):
+--------------------------------------------------------------------------------
+  Line   10: class    'FigureGroup'
+  Line   16: function 'assemble_html'
+
+marker/schema/groups/list.py (2 missing):
+--------------------------------------------------------------------------------
+  Line   10: class    'ListGroup'
+  Line   17: function 'assemble_html'
+
+marker/schema/groups/page.py (19 missing):
+--------------------------------------------------------------------------------
+  Line   28: class    'PageGroup'
+  Line   48: function 'incr_block_id'
+  Line   55: function 'add_child'
+  Line   64: function 'get_image'
+  Line  100: function 'current_children'
+  Line  106: function 'get_next_block'
+  Line  127: function 'get_prev_block'
+  Line  135: function 'add_block'
+  Line  148: function 'add_full_block'
+  Line  155: function 'get_block'
+  Line  162: function 'assemble_html'
+  Line  172: function 'compute_line_block_intersections'
+  Line  202: function 'compute_max_structure_block_intersection_pct'
+  Line  221: function 'replace_block'
+  Line  237: function 'identify_missing_blocks'
+  Line  280: function 'create_missing_blocks'
+  Line  315: function 'add_initial_blocks'
+  Line  369: function 'merge_blocks'
+  Line  425: function 'aggregate_block_metadata'
+
+marker/schema/groups/picture.py (2 missing):
+--------------------------------------------------------------------------------
+  Line   10: class    'PictureGroup'
+  Line   16: function 'assemble_html'
+
+marker/schema/groups/table.py (2 missing):
+--------------------------------------------------------------------------------
+  Line   13: class    'TableGroup'
+  Line   19: function 'assemble_html'
+
+marker/schema/polygon.py (27 missing):
+--------------------------------------------------------------------------------
+  Line   15: class    'PolygonBox'
+  Line   22: function 'check_elements'
+  Line   44: function 'height'
+  Line   49: function 'width'
+  Line   54: function 'area'
+  Line   59: function 'center'
+  Line   64: function 'size'
+  Line   69: function 'x_start'
+  Line   74: function 'y_start'
+  Line   79: function 'x_end'
+  Line   84: function 'y_end'
+  Line   91: function 'bbox'
+  Line  100: function 'expand'
+  Line  116: function 'expand_y2'
+  Line  129: function 'expand_y1'
+  Line  143: function 'minimum_gap'
+  Line  180: function 'center_distance'
+  Line  189: function 'tl_distance'
+  Line  195: function 'rescale'
+  Line  213: function 'fit_to_bounds'
+  Line  223: function 'overlap_x'
+  Line  227: function 'overlap_y'
+  Line  231: function 'intersection_area'
+  Line  235: function 'intersection_pct'
+  Line  244: function 'merge'
+  Line  270: function 'from_bbox'
+  Line  148: function 'dist'
+
+marker/schema/registry.py (2 missing):
+--------------------------------------------------------------------------------
+  Line   49: function 'register_block_class'
+  Line   55: function 'get_block_class'
+
+marker/schema/text/char.py (1 missing):
+--------------------------------------------------------------------------------
+  Line   10: class    'Char'
+
+marker/schema/text/line.py (9 missing):
+--------------------------------------------------------------------------------
+  Line   19: function 'remove_tags'
+  Line   25: function 'replace_last'
+  Line   35: function 'strip_trailing_hyphens'
+  Line   54: class    'Line'
+  Line   64: function 'ocr_input_text'
+  Line   80: function 'formatted_text'
+  Line  111: function 'assemble_html'
+  Line  134: function 'render'
+  Line  160: function 'merge'
+
+marker/schema/text/span.py (12 missing):
+--------------------------------------------------------------------------------
+  Line   15: function 'cleanup_text'
+  Line   23: class    'Span'
+  Line   60: function 'bold'
+  Line   64: function 'italic'
+  Line   68: function 'math'
+  Line   72: function 'highlight'
+  Line   76: function 'superscript'
+  Line   80: function 'subscript'
+  Line   84: function 'small'
+  Line   88: function 'code'
+  Line   92: function 'underline'
+  Line   97: function 'assemble_html'
+
+marker/scripts/common.py (1 missing):
+--------------------------------------------------------------------------------
+  Line   46: function 'options_func'
+
+marker/scripts/convert.py (4 missing):
+--------------------------------------------------------------------------------
+  Line   55: function 'worker_init'
+  Line   65: function 'worker_exit'
+  Line   73: function 'process_single_pdf'
+  Line  152: function 'convert_cli'
+
+marker/scripts/extraction_app.py (1 missing):
+--------------------------------------------------------------------------------
+  Line   46: function 'extract_data'
+
+marker/scripts/server.py (4 missing):
+--------------------------------------------------------------------------------
+  Line   89: class    'CommonParams'
+  Line  165: function 'convert_pdf'
+  Line  170: function 'convert_pdf_upload'
+  Line  199: function 'server_cli'
+
+marker/scripts/streamlit_app.py (2 missing):
+--------------------------------------------------------------------------------
+  Line   47: function 'convert_pdf'
+  Line   61: function 'markdown_insert_images'
+
+marker/settings.py (1 missing):
+--------------------------------------------------------------------------------
+  Line   97: class    'Config'

@@ -80,6 +80,18 @@ class LayoutBuilder(BaseBuilder):
         super().__init__(config)
 
     def __call__(self, document: Document, provider: PdfProvider):
+        """
+        Выполняет определение layout (структуры) всех страниц документа.
+        
+        Основной метод builder'а, который выполняет анализ макета страниц либо
+        с помощью ML моделей (Surya), либо принудительно назначает заданный тип блока.
+        После определения layout добавляет найденные блоки в структуру документа
+        и расширяет границы определенных типов блоков.
+        
+        Аргументы:
+            document: Документ для анализа структуры страниц
+            provider: Провайдер с исходными данными PDF
+        """
         if self.force_layout_block is not None:
             # Assign the full content of every page to a single layout type
             layout_results = self.forced_layout(document.pages)
@@ -89,6 +101,17 @@ class LayoutBuilder(BaseBuilder):
         self.expand_layout_blocks(document)
 
     def get_batch_size(self):
+        """
+        Определяет оптимальный размер батча для модели layout в зависимости от устройства.
+        
+        Если размер батча явно указан в конфигурации, используется он.
+        Иначе выбирается оптимальное значение в зависимости от типа устройства:
+        - CUDA (GPU): 12
+        - CPU: 6
+        
+        Возвращает:
+            int: Размер батча для использования в модели layout
+        """
         if self.layout_batch_size is not None:
             return self.layout_batch_size
         elif settings.TORCH_DEVICE_MODEL == "cuda":
@@ -96,6 +119,20 @@ class LayoutBuilder(BaseBuilder):
         return 6
 
     def forced_layout(self, pages: List[PageGroup]) -> List[LayoutResult]:
+        """
+        Создает принудительные результаты layout без использования ML моделей.
+        
+        Вместо анализа структуры страницы с помощью моделей, этот метод назначает
+        всю страницу как один блок указанного типа (force_layout_block).
+        Используется когда нужно обработать страницу как единый тип контента,
+        минуя автоматическое определение структуры.
+        
+        Аргументы:
+            pages: Список страниц для обработки
+        
+        Возвращает:
+            List[LayoutResult]: Результаты layout с одним блоком на каждую страницу
+        """
         layout_results = []
         for page in pages:
             layout_results.append(
@@ -115,6 +152,19 @@ class LayoutBuilder(BaseBuilder):
         return layout_results
 
     def surya_layout(self, pages: List[PageGroup]) -> List[LayoutResult]:
+        """
+        Выполняет определение layout с помощью модели Surya.
+        
+        Использует ML модель Surya для автоматического анализа структуры страниц
+        и определения различных типов контента (текст, таблицы, рисунки, заголовки и т.д.).
+        Обрабатывает страницы батчами для оптимальной производительности.
+        
+        Аргументы:
+            pages: Список страниц для анализа
+        
+        Возвращает:
+            List[LayoutResult]: Результаты определения layout для каждой страницы
+        """
         self.layout_model.disable_tqdm = self.disable_tqdm
         layout_results = self.layout_model(
             [p.get_image(highres=False) for p in pages],
@@ -123,6 +173,22 @@ class LayoutBuilder(BaseBuilder):
         return layout_results
 
     def expand_layout_blocks(self, document: Document):
+        """
+        Расширяет границы определенных типов layout блоков для лучшего захвата содержимого.
+        
+        Для блоков определенных типов (Picture, Figure, ComplexRegion) расширяет границы,
+        чтобы захватить весь связанный контент, который мог не войти в исходные границы.
+        Расширение ограничено максимальной долей (max_expand_frac) и минимальным расстоянием
+        до соседних блоков, чтобы избежать пересечений.
+        
+        Алгоритм:
+        1. Для каждого блока нужного типа находит минимальное расстояние до других блоков
+        2. Вычисляет долю расширения на основе этого расстояния (не более max_expand_frac)
+        3. Расширяет границы блока с учетом ограничений размера страницы
+        
+        Аргументы:
+            document: Документ с блоками для расширения
+        """
         for page in document.pages:
             # Collect all blocks on this page as PolygonBox for easy access
             page_blocks = [document.get_block(bid) for bid in page.structure]
@@ -162,6 +228,25 @@ class LayoutBuilder(BaseBuilder):
     def add_blocks_to_pages(
         self, pages: List[PageGroup], layout_results: List[LayoutResult]
     ):
+        """
+        Добавляет обнаруженные layout блоки в структуру страниц документа.
+        
+        Преобразует результаты определения layout в структурированные блоки документа.
+        Для каждого найденного региона создается соответствующий блок нужного типа
+        с правильными координатами и метаданными. Координаты масштабируются из
+        размера изображения layout модели в размер страницы провайдера.
+        
+        Процесс:
+        1. Для каждой страницы и ее layout результата
+        2. Масштабирует координаты из размера layout модели в размер страницы
+        3. Создает блок нужного типа (Text, Table, Figure и т.д.)
+        4. Устанавливает координаты блока и метаданные (top_k вероятности)
+        5. Добавляет блок в структуру страницы
+        
+        Аргументы:
+            pages: Список страниц для добавления блоков
+            layout_results: Результаты определения layout для каждой страницы
+        """
         for page, layout_result in zip(pages, layout_results):
             layout_page_size = PolygonBox.from_bbox(layout_result.image_bbox).size
             provider_page_size = page.polygon.size
